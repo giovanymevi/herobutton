@@ -113,6 +113,7 @@
         height: 47px;
         transition: all 0.3s ease-in-out;
         margin: 0 auto;
+        max-width: 100%;
       }
 
       .container-button:active {
@@ -868,7 +869,7 @@
         innerCopaBtn.style.height = "120px";
         innerCopaBtn.style.width = "160px";
         copaContainer.style.width = "160px";
-        copaContainer.style.height = "auto";
+        copaContainer.style.height = "120px"; // Se fija la altura para evitar que otros botones se encimen
 
         const copaImg = document.createElement("img");
         copaImg.src = generateCopaImageAsDataURL();
