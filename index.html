@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>
+      Proyecto X | Giovanny Mendoza Villamizar | Tecnología & Sostenibilidad
+    </title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #03050b;
+        color: #f0f3fa;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+
+      /* Hero Section con Canvas de partículas */
+      .hero {
+        position: relative;
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        isolation: isolate;
+        padding: 2rem 1.5rem;
+      }
+
+      #particle-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none; /* permite interacción con botones */
+        background: radial-gradient(circle at 20% 30%, #0a0f1e, #020408);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 10;
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+        backdrop-filter: blur(2px);
+      }
+
+      .hero h1 {
+        font-size: clamp(2.5rem, 7vw, 4.8rem);
+        font-weight: 800;
+        background: linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #a0e9ff 50%,
+          #6c63ff 100%
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .hero-tagline {
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: #cdd9ff;
+        max-width: 650px;
+        margin: 0 auto 1.8rem auto;
+        opacity: 0.9;
+        backdrop-filter: blur(4px);
+        background: rgba(10, 20, 30, 0.3);
+        padding: 0.5rem 1rem;
+        border-radius: 60px;
+        display: inline-block;
+      }
+
+      .hero-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      /* New Button Styles from Uiverse.io */
+      .container-button {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas: "bt-1 bt-2 bt-3" "bt-4 bt-5 bt-6";
+        position: relative;
+        perspective: 800px;
+        padding: 0;
+        width: 135px;
+        height: 47px;
+        transition: all 0.3s ease-in-out;
+        margin: 0 auto;
+      }
+
+      .container-button:active {
+        transform: scale(0.95);
+      }
+
+      .hover {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 200;
+        cursor: pointer;
+      }
+
+      .bt-1 {
+        grid-area: bt-1;
+      }
+      .bt-2 {
+        grid-area: bt-2;
+      }
+      .bt-3 {
+        grid-area: bt-3;
+      }
+      .bt-4 {
+        grid-area: bt-4;
+      }
+      .bt-5 {
+        grid-area: bt-5;
+      }
+      .bt-6 {
+        grid-area: bt-6;
+      }
+
+      .bt-1:hover ~ button {
+        transform: rotateX(15deg) rotateY(-15deg) rotateZ(0deg);
+        box-shadow: -2px -2px #18181888;
+      }
+      .bt-1:hover ~ button::after {
+        animation: shake 0.5s ease-in-out 0.3s;
+        text-shadow: -2px -2px #18181888;
+      }
+      .bt-3:hover ~ button {
+        transform: rotateX(15deg) rotateY(15deg) rotateZ(0deg);
+        box-shadow: 2px -2px #18181888;
+      }
+      .bt-3:hover ~ button::after {
+        animation: shake 0.5s ease-in-out 0.3s;
+        text-shadow: 2px -2px #18181888;
+      }
+      .bt-4:hover ~ button {
+        transform: rotateX(-15deg) rotateY(-15deg) rotateZ(0deg);
+        box-shadow: -2px 2px #18181888;
+      }
+      .bt-4:hover ~ button::after {
+        animation: shake 0.5s ease-in-out 0.3s;
+        text-shadow: -2px 2px #18181888;
+      }
+      .bt-6:hover ~ button {
+        transform: rotateX(-15deg) rotateY(15deg) rotateZ(0deg);
+        box-shadow: 2px 2px #18181888;
+      }
+      .bt-6:hover ~ button::after {
+        animation: shake 0.5s ease-in-out 0.3s;
+        text-shadow: 2px 2px #18181888;
+      }
+
+      .hover:hover ~ button::before {
+        background: transparent;
+      }
+
+      .hover:hover ~ button::after {
+        content: attr(data-hover);
+        top: -150%;
+        transform: translate(-50%, 0);
+        font-size: 24px;
+        color: #f19c2b;
+      }
+
+      .container-button button {
+        position: absolute;
+        padding: 0;
+        width: 135px;
+        height: 47px;
+        background: transparent;
+        font-size: 14px;
+        font-weight: 900;
+        border: 3px solid #f39923;
+        border-radius: 12px;
+        transition: all 0.3s ease-in-out;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      .container-button button::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 135px;
+        height: 47px;
+        background-color: #f5ae51;
+        border-radius: 12px;
+        transition: all 0.3s ease-in-out;
+        z-index: -1;
+      }
+
+      .container-button button::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 135px;
+        height: 47px;
+        background-color: transparent;
+        font-size: 12px;
+        font-weight: 900;
+        line-height: 47px;
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        transition: all 0.3s ease-in-out;
+        z-index: 2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 5px;
+      }
+
+      @keyframes shake {
+        0% {
+          left: 45%;
+        }
+        25% {
+          left: 54%;
+        }
+        50% {
+          left: 48%;
+        }
+        75% {
+          left: 52%;
+        }
+        100% {
+          left: 50%;
+        }
+      }
+
+      /* Sección de botones múltiples (proyecto X) */
+      .section-buttons {
+        padding: 4rem 2rem;
+        background: rgba(3, 5, 11, 0.85);
+        backdrop-filter: blur(2px);
+        border-top: 1px solid rgba(108, 99, 255, 0.2);
+        border-bottom: 1px solid rgba(108, 99, 255, 0.2);
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        background: linear-gradient(120deg, #e2e8ff, #9ca3ff);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+
+      .buttons-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 1.2rem;
+        max-width: 1300px;
+        margin: 0 auto;
+      }
+
+      /* pie de página */
+      .footer-note {
+        text-align: center;
+        padding: 2rem;
+        font-size: 0.8rem;
+        color: #7c85b2;
+        background: #01010180;
+      }
+
+      @media (max-width: 700px) {
+        .buttons-grid {
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: 0.9rem;
+        }
+        .hero-buttons {
+          gap: 0.7rem;
+        }
+        .section-buttons {
+          padding: 2.5rem 1rem;
+        }
+      }
+
+      /* Estilos para el modal de Objetivos */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 3000;
+        backdrop-filter: blur(10px);
+        padding: 20px;
+      }
+
+      .modal-content {
+        background: #000000;
+        color: #f0f3fa;
+        padding: 2.5rem;
+        border: 2px solid #6c63ff;
+        border-radius: 20px;
+        max-width: 600px;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(108, 99, 255, 0.4);
+        animation: modalFadeIn 0.4s ease-out;
+      }
+
+      .modal-content p {
+        font-size: 1.15rem;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+        font-weight: 400;
+        text-align: justify;
+        color: #e0e6ff;
+      }
+
+      .modal-close-btn {
+        background: linear-gradient(135deg, #6c63ff, #3b33b5);
+        color: white;
+        border: none;
+        padding: 0.8rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 800;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        font-family: inherit;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .modal-close-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(108, 99, 255, 0.6);
+      }
+
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <canvas id="particle-canvas"></canvas>
+      <div class="hero-content">
+        <h1>GIOVANNY MENDOZA VILLAMIZAR</h1>
+        <div class="hero-tagline">
+          🌍 Tecnología sostenible · Material Plástico Innovador · Diseño 3D
+        </div>
+        <div class="hero-buttons">
+          <div class="container-button">
+            <div class="hover bt-1"></div>
+            <div class="hover bt-2"></div>
+            <div class="hover bt-3"></div>
+            <div class="hover bt-4"></div>
+            <div class="hover bt-5"></div>
+            <div class="hover bt-6"></div>
+            <button data-text="🎯 Objetivos" data-hover="Ver más"></button>
+          </div>
+          <div class="container-button">
+            <div class="hover bt-1"></div>
+            <div class="hover bt-2"></div>
+            <div class="hover bt-3"></div>
+            <div class="hover bt-4"></div>
+            <div class="hover bt-5"></div>
+            <div class="hover bt-6"></div>
+            <button data-text="🌱 Ambiente" data-hover="♻️"></button>
+          </div>
+          <div class="container-button">
+            <div class="hover bt-1"></div>
+            <div class="hover bt-2"></div>
+            <div class="hover bt-3"></div>
+            <div class="hover bt-4"></div>
+            <div class="hover bt-5"></div>
+            <div class="hover bt-6"></div>
+            <button data-text="🛠️ Diseño 3D" data-hover="💎"></button>
+          </div>
+          <div class="container-button">
+            <div class="hover bt-1"></div>
+            <div class="hover bt-2"></div>
+            <div class="hover bt-3"></div>
+            <div class="hover bt-4"></div>
+            <div class="hover bt-5"></div>
+            <div class="hover bt-6"></div>
+            <button data-text="🚀 Futuro" data-hover="🔮"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-buttons">
+      <h2 class="section-title">🔹 Proyecto X · Ejes Estratégicos 🔹</h2>
+      <div class="buttons-grid" id="dynamicButtonsGrid">
+        <!-- Los botones se inyectarán con JS desde la lista conceptual, incluyendo el botón especial COPA -->
+      </div>
+    </section>
+
+    <div class="footer-note">
+      <span
+        >♻️ Innovación en materiales plásticos | Sostenibilidad + Economía
+        Circular | Proyecto Tecnológico 2026</span
+      ><br />
+      <span style="font-size: 0.7rem"
+        >Giovanny Mendoza Villamizar - Líder de transformación digital y diseño
+        3D</span
+      >
+    </div>
+
+    <div id="objetivos-modal" class="modal-overlay">
+      <div class="modal-content">
+        <p id="modal-text"></p>
+        <button class="modal-close-btn" onclick="closeObjetivosModal()">
+          Entendido
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // --------------------------------------------------------------
+      // 1. PARTÍCULAS EN CANVAS (estilo "canva particles" interactivo)
+      // --------------------------------------------------------------
+
+      // Funciones para el modal de Objetivos
+      function showInfoModal(category) {
+        const modal = document.getElementById("objetivos-modal");
+        const modalText = document.getElementById("modal-text");
+        
+        const texts = {
+          "Objetivos": "Destacar la visión tecnológica de Giovanny Mendoza Villamizar, enfocada en la innovación con materiales plásticos sostenibles y el diseño 3D para construir un futuro más eficiente y ecológico.",
+          "Ambiente": "Promover el uso responsable de materiales plásticos y su reciclaje, contribuyendo a la protección del ecosistema y la reducción significativa de residuos industriales.",
+          "Diseño 3D": "Aplicar herramientas de modelado tridimensional avanzado para crear prototipos innovadores que faciliten la comprensión y el desarrollo de soluciones técnicas complejas.",
+          "Futuro": "Explorar fronteras tecnológicas que integren sostenibilidad, automatización y creatividad para construir una sociedad más consciente y eficiente.",
+          "Componentes": "Desarrollo de piezas y módulos técnicos optimizados mediante ingeniería de precisión y manufactura aditiva para sistemas de alto rendimiento.",
+          "Beneficios": "Optimización de recursos, reducción de la huella de carbono y mejora en la durabilidad de los productos finales mediante la implementación de tecnología 3D.",
+          "Sostenibilidad": "Integración de prácticas industriales que garantizan el equilibrio entre el crecimiento económico, el cuidado del medio ambiente y el impacto social positivo.",
+          "Materiales": "Investigación avanzada en polímeros técnicos, resinas y filamentos con propiedades mecánicas superiores para aplicaciones industriales exigentes.",
+          "Proyectos": "Gestión de iniciativas de transformación digital que convierten conceptos abstractos en soluciones tecnológicas tangibles, funcionales y escalables.",
+          "Aprendizaje": "Evolución constante en el dominio de nuevas herramientas digitales, ciencia de materiales y metodologías ágiles para la resolución de problemas.",
+          "Ideas": "Espacio de innovación dedicado a la generación de conceptos disruptivos que desafían los límites de la fabricación y el diseño tradicional.",
+          "Mercado": "Análisis estratégico de tendencias globales para la implementación de soluciones tecnológicas en sectores como el packaging, automoción y construcción.",
+          "Economía Circular": "Modelo de producción enfocado en reutilizar, reparar y reciclar materiales para mantener su valor en el tiempo y eliminar el concepto de residuo.",
+          "Prototipado": "Validación rápida de conceptos mediante la creación de modelos físicos funcionales que permiten testear diseño y rendimiento antes de la producción final.",
+          "Reciclaje Innovador": "Transformación de residuos plásticos en materia prima de alta calidad mediante procesos de re-extrusión listos para nuevos ciclos de fabricación 3D.",
+          "Biomateriales": "Desarrollo y aplicación de polímeros derivados de fuentes orgánicas renovables que ofrecen una alternativa ecológica a los plásticos convencionales.",
+          "Certificación": "Validación de procesos bajo estándares internacionales de calidad y sostenibilidad, asegurando la trazabilidad y el compromiso ambiental del proyecto."
+        };
+
+        // Buscamos la coincidencia de texto (ignorando iconos)
+        const key = Object.keys(texts).find(k => category.includes(k));
+        if (!key) return;
+
+        modalText.innerText = texts[key];
+        modal.style.display = "flex";
+
+        // Cerrar modal al hacer clic en el fondo negro (overlay)
+        modal.onclick = function (e) {
+          if (e.target === modal) closeObjetivosModal();
+        };
+      }
+
+      function closeObjetivosModal() {
+        const modal = document.getElementById("objetivos-modal");
+        modal.style.display = "none";
+        modal.onclick = null;
+      }
+
+      // --------------------------------------------------------------
+      const canvas = document.getElementById("particle-canvas");
+      let ctx = canvas.getContext("2d");
+      let particles = [];
+      let particleCount = 130;
+      let mouseX = null,
+        mouseY = null;
+      let animationId = null;
+      let heroSection = document.querySelector(".hero");
+
+      function resizeCanvas() {
+        if (!heroSection) return;
+        const rect = heroSection.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        if (particles.length === 0) initParticles();
+      }
+
+      class Particle {
+        constructor(x, y, radius, color, velocity) {
+          this.x = x;
+          this.y = y;
+          radius = radius;
+          this.radius = radius;
+          this.color = color;
+          this.velocity = velocity;
+          this.alpha = 0.6 + Math.random() * 0.4;
+          this.originalRadius = radius;
+        }
+        draw() {
+          if (!ctx) return;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = "rgba(108, 99, 255, 0.5)";
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+        update() {
+          this.x += this.velocity.x;
+          this.y += this.velocity.y;
+
+          // borders with smooth bounce
+          if (this.x - this.radius < 0) {
+            this.x = this.radius;
+            this.velocity.x *= -0.98;
+          }
+          if (this.x + this.radius > canvas.width) {
+            this.x = canvas.width - this.radius;
+            this.velocity.x *= -0.98;
+          }
+          if (this.y - this.radius < 0) {
+            this.y = this.radius;
+            this.velocity.y *= -0.98;
+          }
+          if (this.y + this.radius > canvas.height) {
+            this.y = canvas.height - this.radius;
+            this.velocity.y *= -0.98;
+          }
+
+          // interacción sutil con mouse (repulsión / atracción ligera)
+          if (mouseX !== null && mouseY !== null) {
+            const dx = mouseX - this.x;
+            const dy = mouseY - this.y;
+            const dist = Math.hypot(dx, dy);
+            const maxDist = 120;
+            if (dist < maxDist) {
+              const force = (maxDist - dist) / maxDist;
+              const angle = Math.atan2(dy, dx);
+              const pushX = Math.cos(angle) * force * 1.2;
+              const pushY = Math.sin(angle) * force * 1.2;
+              this.x -= pushX;
+              this.y -= pushY;
+            }
+          }
+          this.draw();
+        }
+      }
+
+      function initParticles() {
+        particles = [];
+        if (!canvas || !canvas.width || !canvas.height) return;
+        const colors = [
+          "#6C63FF",
+          "#A0E9FF",
+          "#FFD966",
+          "#AB8EFF",
+          "#4DF8FF",
+          "#FF9F7C",
+        ];
+        for (let i = 0; i < particleCount; i++) {
+          const radius = 2 + Math.random() * 5;
+          let x = Math.random() * (canvas.width - radius * 2) + radius;
+          let y = Math.random() * (canvas.height - radius * 2) + radius;
+          const vx = (Math.random() - 0.5) * 0.5;
+          const vy = (Math.random() - 0.5) * 0.5;
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          particles.push(new Particle(x, y, radius, color, { x: vx, y: vy }));
+        }
+      }
+
+      function connectParticles() {
+        if (!ctx) return;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.hypot(dx, dy);
+            if (distance < 100) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(108, 99, 255, ${0.12 * (1 - distance / 100)})`;
+              ctx.lineWidth = 0.7;
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function animateParticles() {
+        if (!ctx || !canvas) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let p of particles) {
+          p.update();
+        }
+        connectParticles();
+        animationId = requestAnimationFrame(animateParticles);
+      }
+
+      function handleMouseMove(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        let clientX = e.clientX - rect.left;
+        let clientY = e.clientY - rect.top;
+        if (
+          clientX >= 0 &&
+          clientX <= rect.width &&
+          clientY >= 0 &&
+          clientY <= rect.height
+        ) {
+          mouseX = clientX * scaleX;
+          mouseY = clientY * scaleY;
+        } else {
+          mouseX = null;
+          mouseY = null;
+        }
+      }
+
+      function handleMouseLeave() {
+        mouseX = null;
+        mouseY = null;
+      }
+
+      function initParticlesAndResize() {
+        resizeCanvas();
+        if (particles.length === 0) initParticles();
+        else {
+          // Reajustar partículas si canvas cambia drásticamente
+          for (let p of particles) {
+            p.x = Math.min(Math.max(p.x, p.radius), canvas.width - p.radius);
+            p.y = Math.min(Math.max(p.y, p.radius), canvas.height - p.radius);
+          }
+        }
+      }
+
+      window.addEventListener("resize", () => {
+        initParticlesAndResize();
+      });
+      if (canvas) {
+        canvas.addEventListener("mousemove", handleMouseMove);
+        canvas.addEventListener("mouseleave", handleMouseLeave);
+        initParticlesAndResize();
+        animateParticles();
+      }
+
+      // --------------------------------------------------------------
+      // 2. Botones dinámicos: lista completa del proyecto + botón imagen COPA
+      // --------------------------------------------------------------
+      const projectKeywords = [
+        "Objetivos",
+        "Medio Ambiente",
+        "Diseño 3D",
+        "Componentes",
+        "Beneficios",
+        "Sostenibilidad",
+        "Materiales",
+        "Proyectos",
+        "Aprendizaje",
+        "Ideas",
+        "Futuro",
+        "Mercados",
+        "Economía Circular",
+        "Prototipado",
+        "Reciclaje Innovador",
+        "Biomateriales",
+      ];
+
+      // Contenedor de botones
+      const buttonsGrid = document.getElementById("dynamicButtonsGrid");
+
+      function createUiverseButton(text, hoverText, onClick) {
+        const container = document.createElement("div");
+        container.className = "container-button";
+        for (let i = 1; i <= 6; i++) {
+          const h = document.createElement("div");
+          h.className = `hover bt-${i}`;
+          container.appendChild(h);
+        }
+        const btn = document.createElement("button");
+        btn.setAttribute("data-text", text);
+        btn.setAttribute("data-hover", hoverText);
+        // Escuchamos el clic en el contenedor porque las capas .hover bloquean al botón
+        container.addEventListener("click", onClick);
+        container.appendChild(btn);
+        return container;
+      }
+
+      // Función para generar la imagen estilo "copa.avif" usando canvas con datos del Mundial 2026
+      function generateCopaImageAsDataURL() {
+        // Crear canvas offscreen con dimensiones 380x260 (ideal para botón)
+        const imgCanvas = document.createElement("canvas");
+        const w = 380,
+          h = 260;
+        imgCanvas.width = w;
+        imgCanvas.height = h;
+        const ctxImg = imgCanvas.getContext("2d");
+
+        // Fondo con gradiente futbolero
+        const grad = ctxImg.createLinearGradient(0, 0, w, h);
+        grad.addColorStop(0, "#0a1f2e");
+        grad.addColorStop(1, "#021c2c");
+        ctxImg.fillStyle = grad;
+        ctxImg.fillRect(0, 0, w, h);
+
+        // Marco dorado
+        ctxImg.strokeStyle = "#FFC857";
+        ctxImg.lineWidth = 2.5;
+        ctxImg.strokeRect(8, 8, w - 16, h - 16);
+
+        // Título principal
+        ctxImg.font = 'bold 18px "Inter", "Segoe UI", system-ui';
+        ctxImg.fillStyle = "#FFE484";
+        ctxImg.shadowBlur = 0;
+        ctxImg.fillText("🏆 FIFA WORLD CUP 2026™", w / 2 - 115, 32);
+
+        // Subtítulo grupos
+        ctxImg.font = 'bold 12px "Inter"';
+        ctxImg.fillStyle = "#c5e0ff";
+        ctxImg.fillText("GROUP STAGE (selección)", w / 2 - 70, 55);
+
+        // Datos reales extraídos del archivo copa.avif (grupos A, B, C)
+        ctxImg.font = '10px "Inter", monospace';
+        ctxImg.fillStyle = "#EFF3FF";
+        // Grupo A
+        ctxImg.fillStyle = "#FFD966";
+        ctxImg.fillText("Grupo A:", 20, 80);
+        ctxImg.fillStyle = "#FFFFFF";
+        ctxImg.fillText("MEX · RSA · KOR · CZE", 85, 80);
+        // Grupo B
+        ctxImg.fillStyle = "#FFD966";
+        ctxImg.fillText("Grupo B:", 20, 98);
+        ctxImg.fillStyle = "#FFFFFF";
+        ctxImg.fillText("CAN · BIH · QAT · SUI", 85, 98);
+        // Grupo C
+        ctxImg.fillStyle = "#FFD966";
+        ctxImg.fillText("Grupo C:", 20, 116);
+        ctxImg.fillStyle = "#FFFFFF";
+        ctxImg.fillText("BRA · MAR · HAI · SCO", 85, 116);
+        // Grupo D
+        ctxImg.fillStyle = "#FFD966";
+        ctxImg.fillText("Grupo D:", 20, 134);
+        ctxImg.fillStyle = "#FFFFFF";
+        ctxImg.fillText("USA · PAR · AUS · TUR", 85, 134);
+        // Grupo E + F
+        ctxImg.fillStyle = "#FFD966";
+        ctxImg.fillText("Grupo E:", 20, 152);
+        ctxImg.fillStyle = "#FFFFFF";
+        ctxImg.fillText("GER · CUW · CIV · ECU", 85, 152);
+        ctxImg.fillStyle = "#FFD966";
+        ctxImg.fillText("Grupo F:", 20, 170);
+        ctxImg.fillStyle = "#FFFFFF";
+        ctxImg.fillText("NED · JPN · SWE · TUN", 85, 170);
+
+        // Equipos destacados (adicional)
+        ctxImg.font = 'italic 9px "Inter"';
+        ctxImg.fillStyle = "#B0C4FF";
+        ctxImg.fillText(
+          "* Más equipos: ARG, FRA, ING, POR, ESP, BEL...",
+          20,
+          198,
+        );
+
+        // Trofeo simple y balón
+        ctxImg.font = '25px "Segoe UI Emoji"';
+        ctxImg.fillStyle = "#FFBF40";
+        ctxImg.fillText("🏆", w - 45, 225);
+        ctxImg.fillStyle = "#D0E0FF";
+        ctxImg.font = '18px "Segoe UI Emoji"';
+        ctxImg.fillText("⚽", 20, 235);
+
+        ctxImg.fillStyle = "#8aa9d6";
+        ctxImg.font = "bold 8px monospace";
+        ctxImg.fillText("2026 · USA · CAN · MEX", w - 110, 250);
+
+        return imgCanvas.toDataURL("image/png"); // excelente calidad, compatible
+      }
+
+      // Crear botones del grid
+      function buildButtonsGrid() {
+        if (!buttonsGrid) return;
+        buttonsGrid.innerHTML = "";
+
+        // Agregar los botones de los keywords con el estilo 3D
+        projectKeywords.forEach((key) => {
+          let icon = "🔘";
+          if (key === "Objetivos") icon = "🎯";
+          else if (key === "Medio Ambiente") icon = "🌿";
+          else if (key === "Diseño 3D") icon = "💎";
+          else if (key === "Sostenibilidad") icon = "♻️";
+          else if (key === "Futuro") icon = "🔮";
+          else if (key === "Materiales") icon = "🧪";
+          else if (key === "Proyectos") icon = "📁";
+          else if (key === "Aprendizaje") icon = "📚";
+          else if (key === "Economía Circular") icon = "🔄";
+          else if (key === "Prototipado") icon = "🛠️";
+          else if (key === "Biomateriales") icon = "🌱";
+          else if (key === "Ideas") icon = "💡";
+          else icon = "✨";
+
+          const btnContainer = createUiverseButton(
+            `${icon} ${key}`,
+            "Explorar",
+            () => {
+              // Verificamos si existe un texto definido para esta clave o parte de ella
+              const hasText = ["Objetivos", "Ambiente", "Diseño 3D", "Componentes", "Beneficios", "Sostenibilidad", "Materiales", "Proyectos", "Aprendizaje", "Ideas", "Futuro", "Mercado", "Economía Circular", "Prototipado", "Reciclaje", "Biomateriales", "Certificación"].some(kw => key.includes(kw));
+              if (hasText) {
+                showInfoModal(key);
+              } else {
+                alert(`🔍 Módulo en desarrollo: ${key}\nPróximamente más detalles sobre este eje estratégico.`);
+              }
+            },
+          );
+          buttonsGrid.appendChild(btnContainer);
+        });
+
+        // AGREGAR BOTÓN ESPECIAL COPA (con estructura 3D)
+        const copaContainer = createUiverseButton(
+          "🏆 MUNDIAL 2026",
+          "⚽ CLICK",
+          () => {
+            window.open("https://calendario-del-mundial2026-gratis.vercel.app/", "_blank");
+          },
+        );
+
+        // Ajustes para que la imagen quepa dentro del botón 3D especial de la copa
+        const innerCopaBtn = copaContainer.querySelector("button");
+        innerCopaBtn.style.height = "120px";
+        innerCopaBtn.style.width = "160px";
+        copaContainer.style.width = "160px";
+        copaContainer.style.height = "auto";
+
+        const copaImg = document.createElement("img");
+        copaImg.src = generateCopaImageAsDataURL();
+        copaImg.style.width = "90%";
+        copaImg.style.marginTop = "10px";
+        copaImg.style.borderRadius = "8px";
+        copaImg.style.pointerEvents = "none";
+        innerCopaBtn.appendChild(copaImg);
+
+        buttonsGrid.appendChild(copaContainer);
+
+        // Botones extra adicionales con estilo 3D
+        buttonsGrid.appendChild(
+          createUiverseButton("♻️ Certificación", "Detalles", () =>
+            alert(
+              "✅ Material plástico biodegradable + diseño 3D paramétrico. Proyecto alineado con ODS 9,12,13.",
+            ),
+          ),
+        );
+
+        buttonsGrid.appendChild(
+          createUiverseButton("📊 Mercado", "Ver Info", () =>
+            alert(
+              "🌎 Mercados potenciales: packaging sostenible, automoción ligera, construcción ecoamigable.",
+            ),
+          ),
+        );
+      }
+
+      buildButtonsGrid();
+
+      // Efecto de notificación en botones del Hero
+      const heroBtnContainers = document.querySelectorAll(".hero-buttons .container-button");
+      heroBtnContainers.forEach((container) => {
+        container.addEventListener("click", (e) => {
+          const btn = container.querySelector("button");
+          const txt = btn.getAttribute("data-text");
+          
+          const allKeys = ["Objetivos", "Ambiente", "Diseño 3D", "Componentes", "Beneficios", "Sostenibilidad", "Materiales", "Proyectos", "Aprendizaje", "Ideas", "Futuro", "Mercado", "Economía Circular", "Prototipado", "Reciclaje", "Biomateriales", "Certificación"];
+          if (txt && allKeys.some(kw => txt.includes(kw))) {
+            showInfoModal(txt);
+          } else {
+            alert(
+              `✨ Sección destacada: ${txt} - Giovanny Mendoza Villamizar impulsa la tecnología responsable.`,
+            );
+          }
+        });
+      });
+
+      // Ajuste de partículas extra si cambia tamaño de hero luego de cargar imagenes
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          if (canvas) initParticlesAndResize();
+        }, 100);
+      });
+
+      // Prevenir que canvas pierda dimensiones si el hero cambia
+      const observer = new ResizeObserver(() => {
+        if (canvas && heroSection) {
+          initParticlesAndResize();
+        }
+      });
+      if (heroSection) observer.observe(heroSection);
+    </script>
+  </body>
+</html>
